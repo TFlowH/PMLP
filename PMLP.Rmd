@@ -1,0 +1,47 @@
+---
+title: "PMLProject"
+author: "TFH"
+date: "15 4 2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+Read Data and cleaning
+
+```{r dataRead}
+library(caret)
+train <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv")
+fintest <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv")
+names <- names(fintest[, colSums(is.na(fintest)) == 0])
+train <- train[, c(names[-length(names)], "classe")] 
+train <- train[, -1:-7]
+```
+
+Split the trainingset for cross validation
+```{r}
+inTrain <- createDataPartition(train$classe, p = 0.7, list = F)
+train_1 <- train[inTrain, ]
+test <- train[-inTrain, ]
+```
+
+Know we have three dataframes, train_1, cross_vali and test.
+
+After I testes some models, I decides, that the randomForest makes the best out of it. Use the caret library. But it was so long, that I did a classification for the final pdf.
+
+```{r}
+set.seed(1)
+model <- train(classe ~., data = train_1, method="rpart")
+```
+
+Check the Accurancy
+
+```{r}
+table(predict(model, test), test$classe)
+
+```
+
+#Conclusion
+
+Train the RF model is really slow, maybe their are some faster, but else it's okey.
+Clasification tree is fast, but teh accurancy is not good.
